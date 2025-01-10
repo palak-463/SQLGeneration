@@ -3,7 +3,7 @@ import openai
 import re
 import os
 
-os.environ['OPENAI_API_KEY']="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"
+os.environ['OPENAI_API_KEY'] = "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"
 
 SYSTEM_CONTEXT = """
 You are a SQL query generator. You understand the following database structures and their relationships:
@@ -45,10 +45,10 @@ def create_rag_system():
     )
     return prompt
 
-def generate_sql_query(user_question):
-    api_key = openai.api_key
+def generate_sql_query(system_context, user_question, api_key):
+    openai.api_key = api_key
     full_prompt = PROMPT_TEMPLATE.format(
-        system_context=SYSTEM_CONTEXT,
+        system_context=system_context,
         user_question=user_question
     )
     response = openai.ChatCompletion.create(
@@ -59,7 +59,7 @@ def generate_sql_query(user_question):
         ],
         temperature=0
     )
-    return response.choices[0].message.content.strip()
+    return response.choices[0].message['content'].strip()
 
 def is_valid_query(query):
     valid_keywords = [
@@ -108,9 +108,10 @@ def main():
     print("\nGenerating SQL Queries for Example Questions\n")
     for idx, question in enumerate(example_questions, 1):
         print(f"Q{idx}: {question}")
+        user_question = question  # Corrected here
         if is_valid_query(question):
             try:
-                query = generate_sql_query(prompt, question, api_key)
+                query = generate_sql_query(SYSTEM_CONTEXT, user_question, api_key)
                 print(f"SQL Query:\n{query}\n")
             except Exception as e:
                 print(f"An error occurred while generating the query: {e}\n")
