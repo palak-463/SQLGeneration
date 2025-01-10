@@ -108,7 +108,7 @@ def main():
     print("\nGenerating SQL Queries for Example Questions\n")
     for idx, question in enumerate(example_questions, 1):
         print(f"Q{idx}: {question}")
-        user_question = question  # Corrected here
+        user_question = question  
         if is_valid_query(question):
             try:
                 query = generate_sql_query(SYSTEM_CONTEXT, user_question, api_key)
