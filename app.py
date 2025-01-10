@@ -1,9 +1,10 @@
-from langchain_core.prompts import PromptTemplate  
-import openai  
+from langchain_core.prompts import PromptTemplate
+import openai
 import os
 import re
 
-os.environ['OPENAI_API_KEY']="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"
+os.environ['OPENAI_API_KEY'] = "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"
+openai.api_key = os.getenv("OPENAI_API_KEY")  
 
 SYSTEM_CONTEXT = """
 You are a SQL query generator. You understand the following database structure:
@@ -21,38 +22,41 @@ Generate SQL queries based on user questions about this data.
 Always return only the SQL query without any explanations.
 """
 
-api_key = os.environ['OPENAI_API_KEY']
- 
 PROMPT_TEMPLATE = """
 {system_context}
 User question: {user_question}
 Return only the SQL query that answers this question.
 """
- 
+
 def create_rag_system():
+    """Creates the prompt system using the template."""
     prompt = PromptTemplate(
         input_variables=["system_context", "user_question"],
         template=PROMPT_TEMPLATE
     )
     return prompt
- 
+
 def generate_sql_query(user_question):
-    api_key = openai.api_key
+    """Generates SQL query using OpenAI ChatCompletion API."""
     full_prompt = PROMPT_TEMPLATE.format(
         system_context=SYSTEM_CONTEXT,
         user_question=user_question
     )
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",  
-        messages=[
-            {"role": "system", "content": "You are a SQL query generator. Return only SQL queries without any explanation."},
-            {"role": "user", "content": full_prompt}
-        ],
-        temperature=0
-    )
-    return response.choices[0].message.content.strip()
- 
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a SQL query generator. Return only SQL queries without any explanation."},
+                {"role": "user", "content": full_prompt}
+            ],
+            temperature=0
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        return f"Error: {e}"
+
 def main():
+    """Main function to run the SQL query generator."""
     prompt = create_rag_system()
     example_questions = [
         "Generate a query to list all employees reporting to 'Jane Smith', including their departments and designations.",
@@ -73,9 +77,9 @@ def main():
         "Generate a query to find the total number of employees whose EmployeeID starts with 'E6'."
     ]
     for question in example_questions:
-        query = generate_sql_query(prompt, question, api_key)
+        query = generate_sql_query(question)  
         print(f"\nQuestion: {question}")
         print(f"Generated Query: {query}")
- 
+
 if __name__ == "__main__":
     main()
