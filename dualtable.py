@@ -54,7 +54,7 @@ def generate_sql_query(system_context, user_question, api_key):
     )
     
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",  
+        model="gpt-4o-mini",  
         messages=[
             {"role": "system", "content": "You are a SQL query generator. Return only SQL queries without any explanation."},
             {"role": "user", "content": full_prompt}

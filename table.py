@@ -41,7 +41,7 @@ def generate_sql_query(user_question):
 
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=message_history,
             temperature=0
         )

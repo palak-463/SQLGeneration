@@ -13,18 +13,16 @@ You are a SQL query generator. You understand the following database structure:
     Designation VARCHAR(255),
     Salary INT,
     Manager VARCHAR(255)
-Sample data in the table:
-- John Doe (E12345) works in Engineering as Software Engineer, salary 80000, reports to Jane Smith
-- Alice Johnson (E67890) works in HR as HR Manager, salary 70000, reports to David Lee
-- Bob Brown (E54321) works in Sales as Sales Executive, salary 60000, reports to Mike Tyson
-Generate SQL queries based on user questions about this data.
+Generate SQL queries based on user questions about this table structure.
 Always return only the SQL query without any explanations.
 """
 
 PROMPT_TEMPLATE = """
 {system_context}
 User question: {user_question}
-Return only the SQL query that answers this question.
+1. Validate if the question is related to the employee table (structure provided above).
+2. If the question is valid, generate the SQL query for it.
+3. If the question is not valid, respond with "Invalid question. Please ask about the Employee table or related fields."
 """
 
 def call_model(user_question):
@@ -34,7 +32,7 @@ def call_model(user_question):
         user_question=user_question
     )
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a SQL query generator. Return only SQL queries without any explanation."},
             {"role": "user", "content": full_prompt}
@@ -44,23 +42,23 @@ def call_model(user_question):
     generated_query = response.choices[0].message.content.strip()
     return generated_query
 
-def display_table():
-    """Displays the sample employee table."""
-    print("\nSample Employee Table:\n")
-    print(f"{'Employee Name':<20} {'Employee ID':<10} {'Department':<15} {'Designation':<20} {'Salary':<10} {'Manager':<20}")
-    print("-" * 95)
-    sample_data = [
-        ("John Doe", "E12345", "Engineering", "Software Engineer", 80000, "Jane Smith"),
-        ("Alice Johnson", "E67890", "HR", "HR Manager", 70000, "David Lee"),
-        ("Bob Brown", "E54321", "Sales", "Sales Executive", 60000, "Mike Tyson"),
-    ]
-    for row in sample_data:
-        print(f"{row[0]:<20} {row[1]:<10} {row[2]:<15} {row[3]:<20} {row[4]:<10} {row[5]:<20}")
-    print("\n")
+#def display_table():
+    #"""Displays the sample employee table."""
+    #print("\nSample Employee Table:\n")
+    #print(f"{'Employee Name':<20} {'Employee ID':<10} {'Department':<15} {'Designation':<20} {'Salary':<10} {'Manager':<20}")
+    #print("-" * 95)
+    #sample_data = [
+        #("John Doe", "E12345", "Engineering", "Software Engineer", 80000, "Jane Smith"),
+        #("Alice Johnson", "E67890", "HR", "HR Manager", 70000, "David Lee"),
+        #("Bob Brown", "E54321", "Sales", "Sales Executive", 60000, "Mike Tyson"),
+    #]
+    #for row in sample_data:
+        #print(f"{row[0]:<20} {row[1]:<10} {row[2]:<15} {row[3]:<20} {row[4]:<10} {row[5]:<20}")
+    #print("\n")
 
 def is_valid_query(question):
     """Checks if the query contains valid keywords for the Employee table."""
-    valid_keywords = ["employee", "department", "salary", "manager", "name", "designation", "employeeid"]
+    valid_keywords = ["employee", "department", "salary", "manager", "name", "designation", "employee id"]
     return any(re.search(r"\b" + keyword + r"\b", question.lower()) for keyword in valid_keywords)
 
 def main():
@@ -74,8 +72,8 @@ def main():
         if user_question.lower() == 'exit':
             print("Exiting the SQL Query Generator. Goodbye!")
             break
-        elif user_question.lower() == 'table':
-            display_table()
+        #elif user_question.lower() == 'table':
+            #display_table()
         elif is_valid_query(user_question):
             generated_query = call_model(user_question)
             print(f"\nGenerated SQL Query:\n{generated_query}\n")
