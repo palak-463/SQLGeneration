@@ -1,11 +1,7 @@
 import openai
 import os
-from typing import Sequence
-from langchain_core.messages import BaseMessage
-from langgraph.graph.message import add_messages
-from typing_extensions import Annotated, TypedDict
 
-openai.api_key = "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"  
+openai.api_key = "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"
 
 SYSTEM_CONTEXT = """
 You are a SQL query generator. You understand the following database structures and their relationships:
@@ -28,27 +24,33 @@ User question: {user_question}
 Return only the SQL query that answers this question.
 """
 
+message_history = [
+    {"role": "system", "content": "You are a SQL query generator. Return only SQL queries without any explanation."},
+    {"role": "system", "content": SYSTEM_CONTEXT}
+]
+
 def generate_sql_query(user_question):
     """
-    Generate an SQL query based on the user's question.
+    Generate an SQL query based on the user's question, considering memory of recent interactions.
     """
-    api_key = openai.api_key
-    if not api_key:
-        raise ValueError("Missing API Key. Set it in the code or environment variables.")
-    full_prompt = PROMPT_TEMPLATE.format(
-        system_context=SYSTEM_CONTEXT,
-        user_question=user_question
-    )
+    global message_history
+    
+    message_history.append({"role": "user", "content": user_question})
+   
+    message_history = message_history[-10:]
+
     try:
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a SQL query generator. Return only SQL queries without any explanation."},
-                {"role": "user", "content": full_prompt}
-            ],
+            messages=message_history,
             temperature=0
         )
-        return response.choices[0].message.content.strip()
+
+        assistant_reply = response.choices[0].message.content.strip()
+
+        message_history.append({"role": "assistant", "content": assistant_reply})
+
+        return assistant_reply
     except Exception as e:
         print(f"Error generating SQL query: {e}")
         return None

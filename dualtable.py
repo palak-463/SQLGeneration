@@ -46,11 +46,13 @@ def create_rag_system():
     return prompt
 
 def generate_sql_query(system_context, user_question, api_key):
+    
     openai.api_key = api_key
     full_prompt = PROMPT_TEMPLATE.format(
         system_context=system_context,
         user_question=user_question
     )
+    
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",  
         messages=[
