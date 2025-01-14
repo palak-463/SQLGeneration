@@ -19,24 +19,42 @@ Your task is to:
 3. If not valid, respond with "Invalid question. Please ask about the Employee table or related fields."
 """
 
+message_history = [
+    {"role": "system", "content": "You are a SQL query generator. Return only SQL queries or error messages."},
+    {"role": "system", "content": SYSTEM_CONTEXT}
+]
+
 def call_model(user_question):
-    """Call the OpenAI chat model to validate and generate the SQL query based on the user question."""
-    messages = [
-        {"role": "system", "content": SYSTEM_CONTEXT},
-        {"role": "user", "content": f"User question: {user_question}"}
-    ]
+    """
+    Call the OpenAI model to validate and generate the SQL query based on the user question.
+    Maintains a chat history to provide context for better responses.
+    """
+    global message_history
+    
+    message_history.append({"role": "user", "content": user_question})
+    
+    message_history = message_history[-10:]
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4o-mini",  
-        messages=messages,
-        temperature=0
-    )
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",  
+            messages=message_history,
+            temperature=0
+        )
 
-    generated_query = response.choices[0].message['content'].strip()
-    return generated_query
+        assistant_reply = response.choices[0].message['content'].strip()
+        
+        message_history.append({"role": "assistant", "content": assistant_reply})
+
+        return assistant_reply
+    except Exception as e:
+        print(f"Error generating SQL query: {e}")
+        return "An error occurred. Please try again."
 
 def main():
-    """Main function to run the SQL query generator."""
+    """
+    Main function to run the SQL query generator interactively.
+    """
     print("\nWelcome to the SQL Query Generator!")
     print("Ask SQL-related questions about the Employee table. Type 'exit' to exit.\n")
     while True:
@@ -45,8 +63,9 @@ def main():
             print("Exiting the SQL Query Generator. Goodbye!")
             break
         else:
+            print("\nGenerating SQL query...\n")
             generated_query = call_model(user_question)
-            print(f"\nGenerated SQL Query:\n{generated_query}\n")
+            print(f"Generated SQL Query:\n{generated_query}\n")
 
 if __name__ == "__main__":
     main()
