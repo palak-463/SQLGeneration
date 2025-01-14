@@ -55,35 +55,12 @@ def generate_sql_query(user_question):
         print(f"Error generating SQL query: {e}")
         return None
 
-def display_tables():
-    """
-    Display the structure of the Employee and Department tables for the user.
-    """
-    print("Employee Table Structure")
-    print("""
-    | EmployeeID | Name         | DepartmentID | Designation       | Salary | ManagerID |
-    |------------|--------------|--------------|-------------------|--------|-----------|
-    | E12345     | John Doe     | D001         | Software Engineer | 80000  | E67890    |
-    | E67890     | Alice Johnson| D002         | HR Manager        | 90000  | E54321    |
-    | E54321     | Bob Brown    | D003         | Sales Executive   | 60000  | E98765    |
-    | E98765     | Mike Tyson   | D003         | Sales Manager     | 95000  | NULL      |
-    """)
-    print("Department Table Structure")
-    print("""
-    | DepartmentID | DepartmentName   | Location   |
-    |--------------|------------------|------------|
-    | D001         | Engineering      | Building A |
-    | D002         | Human Resources  | Building B |
-    | D003         | Sales            | Building C |
-    """)
-
 def main():
-    display_tables()
     """
     Main interactive loop for user questions.
     """
     print("Welcome to the SQL Query Generator!")
-    print("You can ask questions related to the Employee and Department database.")
+    print("You can ask questions related to the Employee and Department tables.")
     print("Type 'exit' to quit.\n")
     while True:
         user_question = input("Enter your question: ").strip()
