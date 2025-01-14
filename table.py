@@ -65,9 +65,8 @@ def main():
     while True:
         user_question = input("Enter your question: ").strip()
         if user_question.lower() == "exit":
-            print("Goodbye! Have a great day!")
+            print("Goodbye!")
             break
-        print("\nGenerating SQL query...\n")
         sql_query = generate_sql_query(user_question)
         if sql_query:
             print(f"SQL Query:\n{sql_query}\n")

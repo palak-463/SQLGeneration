@@ -19,6 +19,12 @@ Your task is to:
 3. If not valid, respond with "Invalid question. Please ask about the Employee table or related fields."
 """
 
+PROMPT_TEMPLATE = """
+{system_context}
+User question: {user_question}
+Return only the SQL query that answers this question.
+"""
+
 message_history = [
     {"role": "system", "content": "You are a SQL query generator. Return only SQL queries or error messages."},
     {"role": "system", "content": SYSTEM_CONTEXT}
@@ -60,10 +66,9 @@ def main():
     while True:
         user_question = input("Please enter your question: ").strip()
         if user_question.lower() == 'exit':
-            print("Exiting the SQL Query Generator. Goodbye!")
+            print("Goodbye!")
             break
         else:
-            print("\nGenerating SQL query...\n")
             generated_query = call_model(user_question)
             print(f"Generated SQL Query:\n{generated_query}\n")
 
