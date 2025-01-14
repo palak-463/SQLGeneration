@@ -4,7 +4,7 @@ import os
 openai.api_key = "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"
 
 SYSTEM_CONTEXT = """
-You are a SQL query generator. You understand the following database structures and their relationships:
+You are a SQL query generator; please use MS SQL dialect. You do not give Data Definition Queries like create, update, delete or alter queries, you only give queries which are related to fetching data from the table. You understand the following database structures and their relationships:
 Table: Employee
     - EmployeeID VARCHAR(50) PRIMARY KEY
     - Name VARCHAR(255)
