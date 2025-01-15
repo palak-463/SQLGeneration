@@ -1,21 +1,81 @@
 import openai
 import os
-
+ 
 openai.api_key = "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"
-
-SYSTEM_CONTEXT = """
-You are a SQL query generator; please use MS SQL dialect. You do not give Data Definition Queries like create, update, delete or alter queries, you only give queries which are related to fetching data from the table. You understand the following database structures and their relationships:
-Table: Employee
-    - EmployeeID VARCHAR(50) PRIMARY KEY
-    - Name VARCHAR(255)
-    - DepartmentID VARCHAR(50) FOREIGN KEY REFERENCES Department(DepartmentID)
-    - Designation VARCHAR(255)
-    - Salary INT
-    - ManagerID VARCHAR(50) FOREIGN KEY REFERENCES Employee(EmployeeID)
-Table: Department
-    - DepartmentID VARCHAR(50) PRIMARY KEY
-    - DepartmentName VARCHAR(255)
-    - Location VARCHAR(255)
+ 
+SYSTEM_CONTEXT = """ 
+You are a SQL query generator; please use MS SQL dialect. You do not give Data Definition Queries like create, update, delete or alter queries, you only give queries which are related to fetching data from the table. Whenever the user asks for any records, you return a query which will fetch a maximum of 1000 data entries. You understand the following database structures and their relationships:
+1. Table: PentanaCustomerVehicleMapping
+    Primary Key: Id
+    Columns:
+    Id (int, NOT NULL, Identity)
+    SalesServiceCaseId (nvarchar(50), NULL)
+    UserId (nvarchar(50), NULL)
+    CustomerId (nvarchar(50), NULL)
+    VehicleId (nvarchar(50), NULL)
+    Indexes:
+    IX_PentanaCustomerVehicleMapping_CustomerId_Vehicleid (CustomerId, VehicleId)
+2. Table: LabourSales_SoldHours
+    Primary Key: Id
+    Columns:
+    Id (int, NOT NULL, Identity)
+    YearStartdate (date, NULL)
+    YearEnddate (date, NULL)
+    MonthStartdate (date, NULL)
+    MonthEnddate (date, NULL)
+    DealerCode (nvarchar(255), NULL)
+    DealerName (nvarchar(255), NULL)
+    Brand (nvarchar(255), NULL)
+    DMSProvider (nvarchar(40), NULL)
+    SoldHoursofLabour (nvarchar(100), NULL)
+    SoldHoursbyFRU (nvarchar(100), NULL)
+    LabourAmount (nvarchar(100), NULL)
+    Indexes:
+    IX_LabourSales_SoldHours_DealerCode (DealerCode)
+3. Table: PentanaCustomer
+    Primary Key: Id
+    Columns:
+    Id (int, NOT NULL, Identity)
+    CustomerId (varchar(50), NULL)
+    DealerNumber (nvarchar(50), NULL)
+    DealerName (nvarchar(50), NULL)
+    FirstName (nvarchar(50), NULL)
+    LastName (nvarchar(50), NULL)
+    Email (nvarchar(100), NULL)
+    MobilePhone (nvarchar(50), NULL)
+    BirthDate (nvarchar(50), NULL)
+4. Table: PentanaVehicle
+    Primary Key: Id
+    Columns:
+    Id (int, NOT NULL, Identity)
+    VehicleId (nvarchar(50), NULL)
+    DealerNumber (nvarchar(50), NULL)
+    DealerName (nvarchar(50), NULL)
+    ShortVIN (nvarchar(50), NULL)
+    LongVIN (nvarchar(50), NULL)
+    Model (nvarchar(100), NULL)
+    Brand (nvarchar(50), NULL)
+    FirstRegistrationDate (nvarchar(50), NULL)
+    WarrantyStartDate (nvarchar(50), NULL)
+    Indexes:
+    IX_PentanaVehicle_VehicleId_DealerNumber (VehicleId, DealerNumber)
+5. Table: Throughput
+    Primary Key: Id
+    Columns:
+    Id (int, NOT NULL, Identity)
+    YearStartdate (date, NULL)
+    YearEnddate (date, NULL)
+    MonthStartdate (date, NULL)
+    MonthEnddate (date, NULL)
+    DealerCode (nvarchar(255), NULL)
+    DealerName (nvarchar(255), NULL)
+    Brand (nvarchar(255), NULL)
+    DMSProvider (nvarchar(40), NOT NULL)
+    InvoiceType (nvarchar(40), NOT NULL)
+    Quantity (decimal(17,2), NULL)
+    QuantityInculdeIsBodyShopLocation (decimal(17,2), NULL)
+    Indexes:
+    IX_Throughput_DealerCode (DealerCode)
 """
 
 PROMPT_TEMPLATE = """
